@@ -1,0 +1,81 @@
+import pymel.core as pm
+from sets import Set
+
+#functions
+def printItem(list):
+    for item in list:
+        print item
+
+def lightListReconstruct(target, source):
+    for item in source:
+        target.append(item)
+    return target
+
+#variables
+lightTypes = ['aiAreaLight', 'aiMeshLight', 'aiSkyDomeLight', 'aiPhotometricLight']#swap with dictionary later for more straight forward expression
+lpeList = ['C<TS>[DSVOB]', 'C<T.>', 'C<TS>', 'C<TS>.*']
+lightGrps = []
+lights = []
+aovLists = []
+renderOptions = pm.ls(type = 'aiOptions')[0]
+aovDriver = pm.ls(type = 'aiAOVDriver')[1]
+aovFilter = pm.ls(type = 'aiAOVFilter')[0]
+
+#light gathering
+areaLights = pm.ls(type = lightTypes[0])
+meshLights = pm.ls(type = lightTypes[1])
+domeLights = pm.ls(type = lightTypes[2])
+photometricLights = pm.ls(type = lightTypes[3])
+
+lights = lightListReconstruct(lights, areaLights)
+lights = lightListReconstruct(lights, meshLights)
+lights = lightListReconstruct(lights, domeLights)
+lights = lightListReconstruct(lights, photometricLights)
+
+for light in lights:
+    lightGrps.append(pm.getAttr(light.aiAov))
+lightGrps = Set(lightGrps)
+
+for lightGrp in lightGrps:
+    tempAov = pm.createNode('aiAOV', n = lightGrp)
+    aovCount = len(renderOptions.getAttr('aovList'))
+    pm.setAttr('{}.name'.format(tempAov), lightGrp)
+    pm.connectAttr('{}.message'.format(aovDriver), '{}.outputs[0].driver'.format(tempAov))
+    pm.connectAttr('{}.message'.format(aovFilter), '{}.outputs[0].filter'.format(tempAov))
+    pm.connectAttr('{}.message'.format(tempAov), '{}.aovList[{}]'.format(renderOptions, aovCount))
+    tempAov.setAttr('lightPathExpression',  "{}<L.'{}'>".format(lpeList[3],lightGrp))    
+    aovLists.append(tempAov)
+
+
+
+
+tempAov = pm.createNode('aiAOV', n = lightGrp)
+aovCount = len(renderOptions.getAttr('aovList'))
+print aovCount
+pm.connectAttr('{}.message'.format(aovDriver), '{}.outputs[0].driver'.format(tempAov))
+pm.connectAttr('{}.message'.format(aovFilter), '{}.outputs[0].filter'.format(tempAov))
+pm.connectAttr('{}.message'.format(tempAov), '{}.aovList[{}]'.format(renderOptions, aovCount))
+tempAov.setAttr('lightPathExpression',  "{}<L.'{}'>*".format(lpeList[3],lightGrp))    
+aovLists.append(tempAov)
+#for light in lights:
+#    pm.createNode('aiAOV', n = light.getParent()) 
+   
+#print areaLights[0].nodeType()
+
+
+
+
+
+
+for item in tempAov.listAttr():
+    print item
+
+pm.setAttr('aiAOV_temp.enabled', False)
+for item in temp.listAttr():
+    print item
+    print pm.getAttr('{}'.format(item))
+output = pm.getAttr('aiAOV_temp.lightPathExpression')
+temp.getAttr('lightPathExpression')
+
+temp.setAttr('lightPathExpression', 'C.*')
+
