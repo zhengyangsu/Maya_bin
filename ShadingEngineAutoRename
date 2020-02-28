@@ -1,0 +1,10 @@
+import pymel.core as pm
+        
+sel = pm.ls(sl = True)
+
+for shader in sel:
+    name = shader
+    print name
+    sg = pm.listConnections(shader, type = "shadingEngine")[0]
+    print sg
+    pm.rename(sg, "{}_SG".format(name))
