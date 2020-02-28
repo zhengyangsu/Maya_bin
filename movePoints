@@ -1,0 +1,7 @@
+import maya.cmds as cmds
+
+points = cmds.ls(sl = True)
+for item in points:
+    print item
+loc =(cmds.pointPosition(points[0], w=True))
+cmds.move(loc[0],loc[1],loc[2], points[1], absolute=True)
