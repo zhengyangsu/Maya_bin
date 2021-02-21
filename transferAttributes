@@ -1,0 +1,10 @@
+import maya.cmds as cmds
+import pymel.core as pm
+
+source = pm.ls(selection = True)
+items = pm.ls(selection = True)
+
+
+for item in items:
+    print item
+    pm.transferAttributes( source, item, transferUVs = 2, sampleSpace = 5)
