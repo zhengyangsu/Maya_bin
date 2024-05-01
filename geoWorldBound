@@ -1,0 +1,30 @@
+from maya import cmds as mc
+import pymel.core as pm
+
+grpMaxY= 1859.481
+
+selected_items = pm.ls(sl=True)
+
+for i in selected_items:
+    selection = pm.listRelatives(i, shapes=True)
+    
+    print selection
+    
+   
+    maxY = pm.getAttr('{}.boundingBoxMaxY'.format(i))
+    minY = pm.getAttr('{}.boundingBoxMinY'.format(i))
+    boundY = maxY - minY
+    print maxY
+    print minY
+    print boundY
+    try:
+        pm.deleteAttr(selection, at='rmanP__minY')
+        pm.deleteAttr(selection, at='rmanP__maxY')
+        pm.deleteAttr(selection, at='rmanP__grpMaxY')
+    except:
+        pass
+        
+    pm.addAttr(selection, longName = 'rmanP__minY', attributeType = 'float', defaultValue = minY)
+    pm.addAttr(selection, longName = 'rmanP__maxY', attributeType = 'float', defaultValue = maxY)
+    pm.addAttr(selection, longName = 'rmanP__grpMaxY', attributeType = 'float', defaultValue = grpMaxY)
+    print pm.listAttr(selection)
